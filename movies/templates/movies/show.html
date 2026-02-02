@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
@@ -49,6 +48,13 @@
               Delete
             </a>
             {% endif %}
+            {% if user.is_authenticated and user != review.user %}
+            <form method="post" action="{% url 'movies.report_review' id=template_data.movie.id review_id=review.id %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning btn-sm">Report</button>
+            </form>
+            {% endif %}
+
           </li>
           {% endfor %}
         </ul>
