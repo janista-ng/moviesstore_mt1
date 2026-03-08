@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Admin Dashboard</h1>
+
+    {% if template_data.top_user %}
+        <div class=""card mt-3 p-3>
+            <h3>User with most purchases</h3>
+            <p>
+                <strong>User:</strong> {{ template_data.top_user.username }}
+            </p>
+            <p>
+                <strong>Movies purchased:</strong> {{ template_data.top_user.total_movies }}
+            </p>
+        </div>
+    {% else %}
+        <p class="mt-3">No purchases yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
