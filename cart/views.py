@@ -4,7 +4,7 @@ from movies.models import Movie
 from .utils import calculate_cart_total
 from .models import Order, Item
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.contrib.auth.models import User
 
 def index(request):
@@ -68,7 +68,9 @@ def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('home.index')
     top_user = (User.objects.annotate(total_movies=Sum('order__item__quantity')).filter(total_movies__isnull=False).order_by('-total_movies', 'username').first())
+    top_commenter = (User.objects.annotate(total_comments=Count('review')).filter(total_comments__gt=0).order_by('-total_comments', 'username').first())
     template_data = {}
     template_data['title'] = 'Admin Dashboard'
     template_data['top_user'] = top_user
+    template_data['top_commenter'] = top_commenter
     return render(request, 'cart/admin_dashboard.html', {'template_data': template_data})
