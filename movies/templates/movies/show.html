@@ -1,6 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
+<style>
+    .star-rating {
+      display: inline-flex;
+      flex-direction: row-reverse;
+      gap: 0.15rem
+    }
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      font-size: 2rem;
+      color: #ccc;
+      cursor: pointer;
+      margin: 0;
+      transition: color 0.2s ease;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+      color: gold;
+    }
+  </style>  
 <div class="p-3">
   <div class="container">
     <div class="row mt-3">
@@ -37,6 +61,16 @@
             <h6 class="card-subtitle mb-2 text-muted">
               {{ review.date }}
             </h6>
+
+            <div class="mb-2">
+              <span class="{% if review.rating >= 1 %}text-warning{% else %}text-secondary{%endif%} fs-5">&#9733;</span>
+              <span class="{% if review.rating >= 2 %}text-warning{% else %}text-secondary{%endif%} fs-5">&#9733;</span>
+              <span class="{% if review.rating >= 3 %}text-warning{% else %}text-secondary{%endif%} fs-5">&#9733;</span>
+              <span class="{% if review.rating >= 4 %}text-warning{% else %}text-secondary{%endif%} fs-5">&#9733;</span>
+              <span class="{% if review.rating >= 5 %}text-warning{% else %}text-secondary{%endif%} fs-5">&#9733;</span>
+              <span class= "ms-2">{{ review.rating }}/5</span>
+            </div>
+
             <p class="card-text">{{ review.comment }}</p>
             {% if user.is_authenticated and user == review.user %}
             <a class="btn btn-primary"
@@ -69,6 +103,25 @@
                   <form method="POST" action="{% url 'movies.create_review' id=template_data.movie.id %}">
                     {% csrf_token %}
                     <p>
+                      <label class="form-label d-block">Rating:</label>
+                      <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5" required>
+                        <label for="star5">&#9733;</label>
+
+                        <input type="radio" id="star4" name="rating" value="4" required>
+                        <label for="star4">&#9733;</label>
+
+                        <input type="radio" id="star3" name="rating" value="3" required>
+                        <label for="star3">&#9733;</label>
+
+                        <input type="radio" id="star2" name="rating" value="2" required>
+                        <label for="star2">&#9733;</label>
+
+                        <input type="radio" id="star1" name="rating" value="1" required>
+                        <label for="star1">&#9733;</label>
+                      </div>
+                    </p>  
+                    <p>
                       <label for="comment">Comment:</label>
                       <textarea name="comment" required class="form-control" id="comment"></textarea>
                     </p>
@@ -84,6 +137,10 @@
             </div>
           </div>
         </div>
+        {% else %}
+        <div class="mt-4">
+          <p><b>You must be signed in to rate and review this movie.</b></p>
+        </div>  
         {% endif %}
       </div>
       <div class="col-md-6 mx-auto mb-3 text-center">

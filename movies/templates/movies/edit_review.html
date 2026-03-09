@@ -1,5 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+  .star-rating {
+      display: inline-flex;
+      flex-direction: row-reverse;
+      gap: 0.15rem
+    }
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      font-size: 2rem;
+      color: #ccc;
+      cursor: pointer;
+      margin: 0;
+      transition: color 0.2s ease;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+      color: gold;
+    }
+  </style>    
 <div class="p-3">
   <div class="container">
     <div class="row mt-3">
@@ -8,6 +32,24 @@
         <hr />
         <form method="POST">
           {% csrf_token %}
+          
+          <p>
+            <label class="form-label d-block">Rating:</label>        
+            <div class="star-rating">     
+              <input type="radio" id="star5" name="rating" value="5" required>                        
+              <label for="star5">&#9733;</label>
+              <input type="radio" id="star4" name="rating" value="4" required>
+              <label for="star4">&#9733;</label>
+              <input type="radio" id="star3" name="rating" value="3" required>
+              <label for="star3">&#9733;</label>
+              <input type="radio" id="star2" name="rating" value="2" required>
+              <label for="star2">&#9733;</label>
+              <input type="radio" id="star1" name="rating" value="1" required>
+                        
+              <label for="star1">&#9733;</label>        
+            </div>
+          
+          </p>  
           <p>
             <label for="comment">Comment:</label>
             <textarea name="comment" required class="form-control" id="comment">{{ template_data.review.comment }}</textarea>

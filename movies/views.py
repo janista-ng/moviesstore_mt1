@@ -26,16 +26,21 @@ def show(request, id):
 
 @login_required
 def create_review(request, id):
-    if request.method == 'POST' and request.POST['comment'] != '':
-        movie = Movie.objects.get(id=id)
-        review = Review()
-        review.comment = request.POST['comment']
-        review.movie = movie
-        review.user = request.user
-        review.save()
-        return redirect('movies.show', id=id)
-    else:
-        return redirect('movies.show', id=id)
+    movie = get_object_or_404(Movie, id=id)
+    if request.method == 'POST':
+        comment = request.POST.get('comment', '').strip()
+        rating = request.POST.get('rating', '').strip()
+        if comment != '' and rating.isdigit():
+            rating = int(rating)
+            if 1 <= rating <= 5:
+                review = Review()
+                review.comment = comment
+                review.rating = rating
+                review.movie = movie
+                review.user = request.user
+                review.save()
+        
+    return redirect('movies.show', id=id)
 
 @login_required
 def edit_review(request, id, review_id):
@@ -48,13 +53,17 @@ def edit_review(request, id, review_id):
         template_data['title'] = 'Edit Review'
         template_data['review'] = review
         return render(request, 'movies/edit_review.html', {'template_data': template_data})
-    elif request.method == 'POST' and request.POST['comment'] != '':
-        review = Review.objects.get(id=review_id)
-        review.comment = request.POST['comment']
-        review.save()
+    elif request.method == 'POST':
+        comment = request.POST.get('comment', '').strip()
+        rating = request.POST.get('rating', '').strip()
+        if comment != '' and rating.isdigit():
+            rating = int(rating)
+            if 1 <= rating <= 5:
+                review.comment = comment
+                review.rating = rating
+                review.save()
         return redirect('movies.show', id=id)
-    else:
-        return redirect('movies.show', id=id)
+    return redirect('movies.show', id=id)
 
 @login_required
 def delete_review(request, id, review_id):
@@ -65,6 +74,7 @@ def delete_review(request, id, review_id):
 @login_required
 def report_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id)
-    review.is_reported = True
-    review.save()
+    if request.user != review.user:
+        review.is_reported = True
+        review.save()
     return redirect('movies.show', id=id)
