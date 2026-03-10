@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
-from movies.models import Movie
+from movies.models import Movie, Review
 from .utils import calculate_cart_total
 from .models import Order, Item
 from django.contrib.auth.decorators import login_required
@@ -67,10 +67,17 @@ def purchase(request):
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('home.index')
+    
     top_user = (User.objects.annotate(total_movies=Sum('order__item__quantity')).filter(total_movies__isnull=False).order_by('-total_movies', 'username').first())
     top_commenter = (User.objects.annotate(total_comments=Count('review')).filter(total_comments__gt=0).order_by('-total_comments', 'username').first())
+    most_bought_movie = (Movie.objects.annotate(total_bought=Sum('item__quantity')).filter(total_bought__isnull=False).order_by('-total_bought', 'name').first())
+    most_reviewed_movie = (Movie.objects.annotate(total_reviews=Count('review')).filter(total_reviews__gt=0).order_by('-total_reviews', 'name').first())
+    
     template_data = {}
     template_data['title'] = 'Admin Dashboard'
     template_data['top_user'] = top_user
     template_data['top_commenter'] = top_commenter
+    template_data['most_bought_movie'] = most_bought_movie
+    template_data['most_reviewed_movie'] = most_reviewed_movie
+
     return render(request, 'cart/admin_dashboard.html', {'template_data': template_data})
