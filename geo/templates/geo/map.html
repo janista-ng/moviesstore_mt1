@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="p-3 mt-4">
+  <div class="container">
+    <h1>Local Popularity Map</h1>
+    <div id="map" style="height:75vh;"></div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<style>
+  /* make markers not show link cursor */
+  .leaflet-marker-icon, .leaflet-div-icon { cursor: default !important; }
+</style>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script>
+const map = L.map('map').setView([39.5, -98.35], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+// marker cluster group
+const markers = L.markerClusterGroup();
+
+fetch("{% url 'popular-locations' %}")
+  .then(r => r.json())
+  .then(data => {
+    if (!data.features) return;
+    data.features.forEach(f => {
+      const [lon, lat] = f.geometry.coordinates;
+      const p = f.properties;
+      // size by purchase_count (adjust scale as needed)
+      const size = Math.max(6, Math.log((p.purchase_count||0) + 1) * 4);
+
+      // marker as circle icon via DivIcon (keeps clustering working)
+      const html = `<div style="
+            width:${size*2}px;height:${size*2}px;
+            background:rgba(0,123,255,0.7);border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            color:white;font-size:10px">
+            ${p.purchase_count || 0}
+          </div>`;
+      const icon = L.divIcon({ html: html, className: '', iconSize: [size*2, size*2] });
+
+      const marker = L.marker([lat, lon], { icon: icon });
+
+      // build popup with top movies list
+      let moviesHtml = '<em>No movies</em>';
+      if (p.top_movies && p.top_movies.length) {
+        moviesHtml = '<ol style="margin:0 0 0 16px;padding:0">';
+        p.top_movies.forEach(m => {
+          moviesHtml += `<li>${m.title} <small>(${m.count})</small></li>`;
+        });
+        moviesHtml += '</ol>';
+      }
+
+      const popup = `<strong>${p.city_name}</strong><br/>Purchases: ${p.purchase_count || 0}<br/>Top movies:${moviesHtml}`;
+      marker.bindPopup(popup);
+
+      
+
+      markers.addLayer(marker);
+    });
+
+    map.addLayer(markers);
+
+    // adjust viewport to markers bounds (if any)
+    const bounds = markers.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40] });
+  })
+  .catch(err => console.error('Failed loading geojson', err));
+</script>
+{% endblock content %}
