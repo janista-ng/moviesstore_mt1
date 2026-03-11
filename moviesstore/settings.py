@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'home',
     'movies',
     'accounts',
+    'cities_light',
+    'geo',
     'cart',
 ]
 
@@ -133,3 +135,10 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['US']
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'STLMT',]
+CITIES_LIGHT_CITY_SOURCES = [
+  "http://download.geonames.org/export/dump/cities15000.zip",
+]

@@ -30,42 +30,5 @@
     {% else %}
         <p class="mt-3">No has made any comments yet.</p>
     {% endif %}
-
-    {% if template_data.most_bought_movie %}
-        <div class = "card mt-3 p-3">
-            <h3>Most Bought Movies</h3>
-            <p>
-                <strong>Movie:</strong> {{ template_data.most_bought_movie.name }}
-            </p>
-            <p>
-                <strong>Times bought:</strong> {{ template_data.most_bought_movie.total_bought }}
-            </p>
-        </div>
-    {% else %}
-        <div class = "card mt-3 p-3">
-            <h3>Most Bought Movie</h3>
-            <p>No movie purchases yet.</p>
-        </div>
-    {% endif %}
-
-    {% if template_data.most_reviewed_movie %}
-        <div class = "card mt-3 p-3">
-            <h3>Most Reviewed Movies</h3>
-            <p>
-                <strong>Movie:</strong> {{ template_data.most_reviewed_movie.name }}
-            </p>
-            <p>
-                <strong>Times bought:</strong> {{ template_data.most_reviewed_movie.total_reviews }}
-            </p>
-        </div>
-    {% else %}
-        <div class = "card mt-3 p-3">
-            <h3>Most Reviewed Movie</h3>
-            <p>No movie reviews yet.</p>
-        </div>
-    {% endif %}
-
-
-
 </div>
 {% endblock %}
